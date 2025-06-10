@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/blogs/
+Content-Type: application/json
+
+{
+    "author": "Hannes",
+    "title": "Climbing",
+    "url": "www.climbing.com",
+    "likes": 0
+}
