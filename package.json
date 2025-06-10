@@ -7,7 +7,7 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf dist && cd ../frontend && npm run build && cp -r dist ../backend",
+    "build:ui": "rmdir /s /q dist && cd \"C:\\Users\\henry\\Downloads\\OneDrive - Etela-Savon Koulutus Oy\\OKT2\\684 Full Stack Open - osa 4 - Express-sovellusten testaaminen, käyttäjänhallinta\\blogilistasovellus\\blogifrontend\" && npm run build && xcopy /E /I dist \"C:\\Users\\henry\\Downloads\\OneDrive - Etela-Savon Koulutus Oy\\blogibackend\"",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "author": "HD",
