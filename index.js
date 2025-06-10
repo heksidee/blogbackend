@@ -80,12 +80,12 @@ app.post("/api/blogs", (request, response) => {
 })
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: "unkonwn endpoint" })
+    response.status(404).send({ error: "unknown endpoint" })
 }
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
