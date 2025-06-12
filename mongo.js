@@ -20,18 +20,6 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema)
 
-const blog = new Blog({
-  author: 'Gerhard',
-  title: 'AI',
-  url: 'www.aiblogs.com',
-  likes: 0
-})
-
-/*blog.save().then(result => {
-  console.log('blog saved!')
-  mongoose.connection.close()
-})*/
-
 Blog.find({}).then(result => {
   result.forEach(blog => {
     console.log(blog)
