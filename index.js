@@ -1,5 +1,7 @@
+require("dotenv").config()
 const express = require("express")
 const app = express()
+const Blog = require("./models/blog")
 
 let blogs = [
     {
@@ -38,7 +40,9 @@ app.use(requestLogger)
 app.use(express.static('dist'))
 
 app.get("/api/blogs", (request, response) => {
-    response.send(blogs)
+    Blog.find({}).then(blogs => {
+        response.json(blogs)
+    })
 })
 
 app.get(`/api/blogs/:id`, (request, response) => {
@@ -83,7 +87,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
