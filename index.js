@@ -46,21 +46,10 @@ app.get("/api/blogs", (request, response) => {
 })
 
 app.get(`/api/blogs/:id`, (request, response) => {
-    const id = request.params.id
-    const blog = blogs.find(blog => blog.id === id)
-    if (blog) {
+    Blog.findById(request.params.id).then(blog => {
         response.json(blog)
-    } else {
-        response.status(404).end()
-    }
-    })
-
-const generateId = () => {
-    const maxId = blogs.length > 0
-        ? Math.max(...blogs.map(n => Number(n.id)))
-        : 0
-    return String(maxId + 1)
-}
+    }) 
+})
 
 app.post("/api/blogs", (request, response) => {
     const body = request.body
@@ -69,16 +58,16 @@ app.post("/api/blogs", (request, response) => {
         return response.status(400).json({ error: "content missing" }) 
     }
 
-    const blog = {
-        id: generateId(),
+    const blog = new Blog({
         author: body.author,
         title: body.title,
         url: body.url,
         likes: 0
-    }
+    }) 
 
-    blogs = blogs.concat(blog)
-    response.json(blog)
+    blog.save().then(savedBlog => {
+        response.json(savedBlog)
+    }) 
 })
 
 const unknownEndpoint = (request, response) => {

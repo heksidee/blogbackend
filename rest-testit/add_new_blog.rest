@@ -2,8 +2,8 @@ POST http://localhost:3001/api/blogs/
 Content-Type: application/json
 
 {
-    "author": "Hannes",
-    "title": "Climbing",
-    "url": "www.climbing.com",
+    "author": "Alborosie",
+    "title": "Deep Dub",
+    "url": "www.dubmusic.com",
     "likes": 0
 }
