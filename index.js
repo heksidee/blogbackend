@@ -76,7 +76,7 @@ app.post("/api/blogs", (request, response) => {
     }) 
 })
 
-app.put("/api.blogs/:id", (request, response, next) => {
+app.put("/api/blogs/:id", (request, response, next) => {
     const { author, title, url, likes } = request.body
     
     Blog.findById(request.params.id)
