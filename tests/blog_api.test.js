@@ -3,7 +3,7 @@ const { test, after, beforeEach } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const Blog = require("../models/note")
+const Blog = require("../models/blog")
 
 const api = supertest(app)
 
@@ -43,8 +43,8 @@ test("all blogs are returned", async () => {
 test("a specifig blog is within the returned blogs", async () => {
     const response = await api.get("/api/blogs")
 
-    const contents = response.body.map(e => e.content)
-    assert.strictEqual(contents.includes("AI"))
+    const titles = response.body.map(e => e.title)
+    assert.ok(titles.includes("AI"))
 })
 after(async () => {
     await mongoose.connection.close()
