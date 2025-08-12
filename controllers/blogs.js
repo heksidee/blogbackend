@@ -33,24 +33,23 @@ blogsRouter.post('/', (request, response, next) => {
   .catch(error => next(error))
 })
 
-blogsRouter.put('/:id', (request, response, next) => {
-  const { author, title, url, likes } = request.body
+blogsRouter.put('/:id', async (request, response, next) => {
+  try {
+    const { author, title, url, likes } = request.body
+    const blog = await Blog.findById(request.params.id)
+    if (!blog) {
+      return response.status(404).end()
+    }
+    blog.author = author
+    blog.title = title
+    blog.url = url
+    blog.likes = likes
 
-  Blog.findById(request.params.id)
-    .then(blog => {
-      if (!blog) {
-        return response.status(404).end()
-      }
-      blog.author = author
-      blog.title = title
-      blog.url = url
-      blog.likes = likes
-
-      return blog.save().then((updatedBlog) => {
-        response.json(updatedBlog)
-      })
-    })
-    .catch(error => next(error))
+    const updatedBlog = await blog.save()
+    response.json(updatedBlog)
+  } catch (error) {
+    next(error)
+  }
 })
 
 blogsRouter.delete("/:id", async (request, response, next) => {

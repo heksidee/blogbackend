@@ -112,6 +112,43 @@ test("blog creation fails with 400 if url is missing", async () => {
         .expect(400)
 })
 
+test("a blog can be deleted", async () => {
+    const blogsAtStart = await api.get("/api/blogs")
+    const blogToDelete = blogsAtStart.body[0]
+
+    await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+    const blogsAtEnd = await api.get("/api/blogs")
+    assert.strictEqual(blogsAtEnd.body.length, blogsAtStart.body.length -1)
+    const titles = blogsAtEnd.body.map(blog => blog.title)
+    assert.ok(!titles.includes(blogToDelete.title))
+})
+
+test("a blog's likes can be updated", async () => {
+    const blogsAtStart = await api.get("/api/blogs")
+    const blogToUpdate = blogsAtStart.body[0]
+
+    const updatedLikes = blogToUpdate.likes + 1
+    const updatedBlogData = {
+        ...blogToUpdate,
+        likes: updatedLikes
+    }
+
+    const response = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlogData)
+        .expect(200)
+        .expect("Content-Type", /application\/json/)
+    
+    assert.strictEqual(response.body.likes, updatedBlogData.likes)
+
+    const blogsAtEnd = await api.get("/api/blogs")
+    const updatedBlog = blogsAtEnd.body.find(b => b.id === blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, updatedBlogData.likes)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
