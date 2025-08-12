@@ -49,7 +49,8 @@ test("a specifig blog is within the returned blogs", async () => {
     assert.ok(titles.includes("AI"))
 })
 
-test("a valid blog can be added", async () => {
+test("a valid blog can be added and blog count increases by one", async () => {
+    const blogsAtStart = await api.get("/api/blogs")
     const newBlog = {
         author: "Bebbis",
         title: "Beebelson",
@@ -57,15 +58,23 @@ test("a valid blog can be added", async () => {
         likes: 0
     }
 
-    await api
+    const postResponse = await api
         .post ("/api/blogs")
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/)
     
-    const response = await api.get("/api/blogs")
-    const titles = response.body.map(blog => blog.title)
-    assert.strictEqual(response.body.length, initialBlogs.length + 1)
+    const addedBlog = postResponse.body
+
+    assert.strictEqual(addedBlog.author, newBlog.author)
+    assert.strictEqual(addedBlog.title, newBlog.title)
+    assert.strictEqual(addedBlog.url, newBlog.url)
+    assert.strictEqual(addedBlog.likes, 0)
+
+    const blogsAtEnd = await api.get("/api/blogs")
+    assert.strictEqual(blogsAtEnd.body.length, blogsAtStart.body.length + 1)
+
+    const titles = blogsAtEnd.body.map(blog => blog.title)
     assert.ok(titles.includes("Beebelson"))
 })
 
@@ -77,6 +86,30 @@ test("blogs have id field instead of _id", async () => {
         assert.ok(blog.id, "idfield should be defined")
         assert.strictEqual(blog._id, undefined, "_id should not be present")
     })
+})
+
+test("blog creation fails with 400 if title is missing", async () => {
+    const blogWithoutTitle = {
+        author: "Blogger",
+        url: "www.blogger.com",
+        likes: 0
+    }
+    await api
+        .post("/api/blogs")
+        .send(blogWithoutTitle)
+        .expect(400)
+})
+
+test("blog creation fails with 400 if url is missing", async () => {
+    const blogWithoutUrl = {
+        author: "Blogger",
+        title: "Blogging",
+        likes: 0
+    }
+    await api
+        .post("/api/blogs")
+        .send(blogWithoutUrl)
+        .expect(400)
 })
 
 after(async () => {
