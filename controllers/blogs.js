@@ -1,4 +1,5 @@
 const blogsRouter = require("express").Router()
+const { EventEmitterAsyncResource } = require("supertest/lib/test")
 const Blog = require("../models/blog")
 
 blogsRouter.get('/', (request, response) => {
@@ -50,6 +51,18 @@ blogsRouter.put('/:id', (request, response, next) => {
       })
     })
     .catch(error => next(error))
+})
+
+blogsRouter.delete("/:id", async (request, response, next) => {
+  try {
+    const deleteBlog = await Blog.findByIdAndDelete(request.params.id)
+    if (!deleteBlog) {
+      return response.status(204).json({ error: "Blog not found" })
+    }
+    response.status(204).end()
+  } catch (error) {
+    next(error)
+  }
 })
 
 module.exports = blogsRouter
