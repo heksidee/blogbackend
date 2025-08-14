@@ -1,9 +1,13 @@
 const assert = require("node:assert")
-const { test, after, beforeEach } = require('node:test')
+const bcrypt = require("bcrypt")
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+
 const app = require('../app')
+const helper = require("./test_helper")
 const Blog = require("../models/blog")
+const User = require("../models/user")
 
 const api = supertest(app)
 
@@ -147,6 +151,62 @@ test("a blog's likes can be updated", async () => {
     const blogsAtEnd = await api.get("/api/blogs")
     const updatedBlog = blogsAtEnd.body.find(b => b.id === blogToUpdate.id)
     assert.strictEqual(updatedBlog.likes, updatedBlogData.likes)
+})
+
+describe('when there is initially one user at db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'hdee', passwordHash })
+
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'Deebelson',
+      name: 'Mikael Huovinen',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    assert(usernames.includes(newUser.username))
+  })
+
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'hdee',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    console.log('Virhe:', result.body.error)
+    assert.match(result.body.error, /duplicate key|username.*unique/i)
+    //assert(result.body.error.includes("expected `username` to be unique"))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
 })
 
 after(async () => {
