@@ -1,0 +1,7 @@
+DELETE http://localhost:3003/api/blogs/689dbab2f483d72e3db3d372
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRlZWJlbHNvbiIsImlkIjoiNjg5ZGFhMzQ5NGIwZWUwM2FkYzU2YjFlIiwiaWF0IjoxNzU1MjU5MzU2fQ.uszL6SYOlSRa77mSQufYFA1KT5LT6TFCI88nE4gX_Gs
+
+{
+    "username": "deebelson",
+    "password": "salainen"
+}

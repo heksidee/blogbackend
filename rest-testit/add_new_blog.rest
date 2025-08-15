@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJlZWJlbHNvbiIsImlkIjoiNjg5ZGFhYTA5NGIwZWUwM2FkYzU2YjIxIiwiaWF0IjoxNzU1MTczNjEwfQ.sTHE1EfZSSNoo56uW6bBctX9h-h3xI0JkKzKjey_Wpo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhcnJlbHNvbiIsImlkIjoiNjg5ZjIyOTZiYjk5NzNlNjFjY2E1Yzk0IiwiaWF0IjoxNzU1MjU5NTkwfQ.7gkpmkxBPkDbiVoQ39n-xcXsFDrP9Ca0PHwHGw7_gR4
 
 {
-    "author": "King Tubby",
-    "title": "Science of King",
-    "url": "www.sk.com",
+    "author": "Kisaaja",
+    "title": "MM -98",
+    "url": "www.mm98.com",
     "likes": 0
 }
