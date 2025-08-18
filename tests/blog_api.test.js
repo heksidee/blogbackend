@@ -26,12 +26,28 @@ const initialBlogs = [
     }
 ]
 
+let token = null
+
 beforeEach(async () => {
+
+    await User.deleteMany({})
     await Blog.deleteMany({})
-    let blogObject = new Blog(initialBlogs[0])
-    await blogObject.save()
-    blogObject = new Blog(initialBlogs[1])
-    await blogObject.save()
+
+    const passwordHash = await bcrypt.hash("salasana", 10)
+    const user = new User({ username: "testuser", passwordHash })
+    await user.save()
+
+    const loginResponse = await api
+        .post("/api/login")
+        .send({ username: "testuser", password: "salasana" })
+    
+    token = loginResponse.body.token
+
+    const blogObject = initialBlogs.map(blog => new Blog({ ...blog, user: user._id}))
+    const savedBlogs = await Promise.all(blogObject.map(blog => blog.save()))
+
+    user.blogs = savedBlogs.map(blog => blog._id)
+    await user.save()
 })
 
 test("blogs are returned as json", async () => {
@@ -64,6 +80,7 @@ test("a valid blog can be added and blog count increases by one", async () => {
 
     const postResponse = await api
         .post ("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/)
@@ -100,6 +117,7 @@ test("blog creation fails with 400 if title is missing", async () => {
     }
     await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(blogWithoutTitle)
         .expect(400)
 })
@@ -112,6 +130,7 @@ test("blog creation fails with 400 if url is missing", async () => {
     }
     await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(blogWithoutUrl)
         .expect(400)
 })
@@ -119,9 +138,11 @@ test("blog creation fails with 400 if url is missing", async () => {
 test("a blog can be deleted", async () => {
     const blogsAtStart = await api.get("/api/blogs")
     const blogToDelete = blogsAtStart.body[0]
+    console.log(blogToDelete)
 
     await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set("Authorization", `Bearer ${token}`)
     .expect(204)
 
     const blogsAtEnd = await api.get("/api/blogs")
@@ -142,6 +163,7 @@ test("a blog's likes can be updated", async () => {
 
     const response = await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set("Authorization", `Bearer ${token}`)
         .send(updatedBlogData)
         .expect(200)
         .expect("Content-Type", /application\/json/)
@@ -203,9 +225,20 @@ describe('when there is initially one user at db', () => {
     const usersAtEnd = await helper.usersInDb()
     console.log('Virhe:', result.body.error)
     assert.match(result.body.error, /duplicate key|username.*unique/i)
-    //assert(result.body.error.includes("expected `username` to be unique"))
-
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test("blog creation fails with 401 if token is missing", async () => {
+    const newBlog = {
+        title: "Blog without token",
+        author: "Tokeness",
+        url: "www.withouttoken.com",
+        likes: 0
+    }
+    await api
+        .post("/api/blogs")
+        .send(newBlog)
+        .expect(401)
   })
 })
 

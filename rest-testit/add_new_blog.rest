@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhcnJlbHNvbiIsImlkIjoiNjg5ZjIyOTZiYjk5NzNlNjFjY2E1Yzk0IiwiaWF0IjoxNzU1MjU5NTkwfQ.7gkpmkxBPkDbiVoQ39n-xcXsFDrP9Ca0PHwHGw7_gR4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRhcnJlbHNvbiIsImlkIjoiNjg5ZjIyOTZiYjk5NzNlNjFjY2E1Yzk0IiwiaWF0IjoxNzU1NTAyMjI1fQ.0pgARKhRZjanGu1JDExxXJOVx56XNIoLwpTF7QUvfd8
 
 {
-    "author": "Kisaaja",
-    "title": "MM -98",
-    "url": "www.mm98.com",
+    "author": "Tietäjä",
+    "title": "Ranska -98",
+    "url": "www.ranska98.com",
     "likes": 0
 }

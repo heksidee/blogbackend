@@ -3,7 +3,7 @@ const blogsRouter = require("express").Router()
 const Blog = require("../models/blog")
 const User = require("../models/user")
 const { response } = require("express")
-const { userExtractor } = require("../utils/middleware")
+const { userExtractor, tokenExtractor } = require("../utils/middleware")
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -23,15 +23,19 @@ blogsRouter.get('/:id', async (request, response, next) => {
   }
 })
 
-blogsRouter.post('/', userExtractor, async (request, response) => {
+blogsRouter.post('/', userExtractor, tokenExtractor, async (request, response) => {
   try {
-    const body = request.body
+    const { title, url, author, likes } = request.body
+
+    if (!title || !url) {
+      return response.status(400).json({ error: "title and url are required" })
+    }
 
     const blog = new Blog({
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes || 0,
+      title,
+      author,
+      url,
+      likes: likes || 0,
       user: request.user._id
     })
 
@@ -45,7 +49,7 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   }
 })
 
-blogsRouter.put('/:id', async (request, response, next) => {
+blogsRouter.put('/:id', userExtractor, tokenExtractor, async (request, response, next) => {
   try {
     const { author, title, url, likes } = request.body
     const blog = await Blog.findById(request.params.id)
@@ -64,21 +68,23 @@ blogsRouter.put('/:id', async (request, response, next) => {
   }
 })
 
-blogsRouter.delete("/:id", userExtractor, async (request, response, next) => {
+blogsRouter.delete("/:id", userExtractor, tokenExtractor, async (request, response, next) => {
   try {
     const blog = await Blog.findById(request.params.id)
     if (!blog) {
       return response.status(404).json({ error: "Blog not found" })
     }
     
-    if (blog.user.toString() !== decodedToken.id) {
-      return response.status(403).json({ error: "unauthorized: not the blog owner" })
-    }
+    if (!blog.user || blog.user.toString() !== request.user._id.toString()) {
+        return response.status(403).json({ error: "unauthorized: not the blog owner" })
+      }
     await Blog.findByIdAndDelete(request.params.id)
 
-    request.user.blogs = request.user.blogs.filter(b => b.toString() !== blog._id.toString())
-    await request.user.save()
-
+    if (!Array.isArray(request.user.blogs)) {
+      request.user.blogs = request.user.blogs.filter(b => b.toString() !== blog._id.toString())
+      await request.user.save()
+    }
+    
     response.status(204).end()
   } catch (error) {
     next(error)
