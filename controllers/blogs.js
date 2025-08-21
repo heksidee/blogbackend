@@ -40,10 +40,11 @@ blogsRouter.post('/', userExtractor, tokenExtractor, async (request, response) =
     })
 
     const savedBlog = await blog.save()
+    const populatedBlog = await savedBlog.populate("user", { username: 1, name: 1})
     request.user.blogs = request.user.blogs.concat(savedBlog._id)
     await request.user.save()
 
-    response.status(201).json(savedBlog)
+    response.status(201).json(populatedBlog)
   } catch (error) {
     next(error)
   }
