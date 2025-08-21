@@ -51,17 +51,12 @@ blogsRouter.post('/', userExtractor, tokenExtractor, async (request, response) =
 
 blogsRouter.put('/:id', userExtractor, tokenExtractor, async (request, response, next) => {
   try {
-    const { author, title, url, likes } = request.body
-    const blog = await Blog.findById(request.params.id)
-    if (!blog) {
-      return response.status(404).end()
-    }
-    blog.author = author
-    blog.title = title
-    blog.url = url
-    blog.likes = likes
-
-    const updatedBlog = await blog.save()
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      { likes: request.body.likes },
+      { new: true, runValidators: true, context: "query" }
+    )
+    
     response.json(updatedBlog)
   } catch (error) {
     next(error)
