@@ -1,6 +1,6 @@
-import globals from 'globals'
-import js from '@eslint/js'
-import stylisticJs from '@stylistic/eslint-plugin-js'
+import globals from 'globals';
+import js from '@eslint/js';
+import stylisticJs from '@stylistic/eslint-plugin-js';
 
 export default [
   js.configs.recommended,
@@ -11,10 +11,10 @@ export default [
       globals: { ...globals.node },
       ecmaVersion: 'latest',
     },
-    plugins: { 
+    plugins: {
       '@stylistic/js': stylisticJs,
     },
-    rules: { 
+    rules: {
       '@stylistic/js/indent': ['error', 2],
       '@stylistic/js/linebreak-style': ['error', 'unix'],
       '@stylistic/js/quotes': ['error', 'single'],
@@ -24,9 +24,9 @@ export default [
       'object-curly-spacing': ['error', 'always'],
       'arrow-spacing': ['error', { before: true, after: true }],
       'no-console': 'off',
-    }
+    },
   },
   {
-    ignores: ["dist/**"]
-  }
+    ignores: ['dist/**'],
+  },
 ];
