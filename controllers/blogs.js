@@ -1,8 +1,5 @@
-/*const jwt = require('jsonwebtoken')*/
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
-/*const User = require('../models/user')
-const { response } = require('express')*/
 const { userExtractor, tokenExtractor } = require('../utils/middleware');
 
 blogsRouter.get('/', async (request, response) => {
@@ -81,6 +78,23 @@ blogsRouter.delete('/:id', userExtractor, tokenExtractor, async (request, respon
     }
 
     response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+blogsRouter.post('/:id/comments', async (request, response, next) => {
+  try {
+    const { comment } = request.body;
+    const blog = await Blog.findById(request.params.id);
+
+    if (!blog) {
+      return response.status(404).json({ error: 'Blog not found' });
+    }
+    blog.comments = blog.comments.concat(comment);
+    const updatedBlog = await blog.save();
+
+    response.status(202).json(updatedBlog);
   } catch (error) {
     next(error);
   }
